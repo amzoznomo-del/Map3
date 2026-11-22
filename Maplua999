@@ -1,0 +1,117 @@
+-- MAP COPY | Items: 49 | Mode: normal
+local Players = game:GetService("Players")
+local W = game:GetService("Workspace")
+local L = game:GetService("Lighting")
+local AssetService = game:GetService("AssetService")
+local player = Players.LocalPlayer
+local n, C, meshCache = {}, {}, {}
+local SetLighting = nil
+local LIGHT_CLASSES = {Sky=true,Atmosphere=true,BloomEffect=true,BlurEffect=true,ColorCorrectionEffect=true,SunRaysEffect=true,DepthOfFieldEffect=true}
+
+local SPAWNS = {CFrame.new(-191.411,1.05,1.388,1,0,0,0,1,0,0,0,1),CFrame.new(-191.411,1.05,17.388,1,0,0,0,1,0,0,0,1),CFrame.new(-175.411,1.05,17.388,1,0,0,0,1,0,0,0,1),CFrame.new(-175.411,1.05,33.388,1,0,0,0,1,0,0,0,1),CFrame.new(-175.411,1.05,1.388,1,0,0,0,1,0,0,0,1),CFrame.new(-191.411,1.05,34.388,1,0,0,0,1,0,0,0,1)}
+local CLEAR_LIGHTING = true
+-- Clear existing map objects
+local function ClearMap()
+	for _, v in ipairs(W:GetChildren()) do
+		if not v:IsA("Terrain") and not v:IsA("Camera") and not Players:GetPlayerFromCharacter(v) then
+			pcall(function() v:Destroy() end)
+		end
+	end
+	if CLEAR_LIGHTING then
+		for _, v in ipairs(L:GetChildren()) do
+			if LIGHT_CLASSES[v.ClassName] then pcall(function() v:Destroy() end) end
+		end
+	end
+end
+
+-- Build copied instances (Part, Mesh, Decal, Texture, Fire, Particle, Spawn, etc.)
+local function Make(class, props, parent, meshId)
+	local inst
+	if class == "MeshPart" then
+		if meshId and meshId ~= "" then
+			local cached = meshCache[meshId]
+			if cached then
+				inst = cached:Clone()
+			else
+				local ok, mp = pcall(function() return AssetService:CreateMeshPartAsync(meshId) end)
+				if not ok and Content and Content.fromUri then
+					ok, mp = pcall(function() return AssetService:CreateMeshPartAsync(Content.fromUri(meshId)) end)
+				end
+				if ok and mp then
+					meshCache[meshId] = mp
+					inst = mp:Clone()
+				end
+			end
+		end
+		if not inst then inst = Instance.new("Part") end
+	else
+		inst = Instance.new(class)
+	end
+	for k, v in pairs(props) do
+		pcall(function() inst[k] = v end)
+	end
+	inst.Parent = parent
+	return inst
+end
+
+-- Link object references (Weld / PrimaryPart)
+local function Ref(a, prop, b)
+	pcall(function() n[a][prop] = n[b] end)
+end
+
+-- Teleport player character to spawn location
+local function WarpToSpawn(char)
+	if #SPAWNS == 0 then return end
+	local hrp = char:WaitForChild("HumanoidRootPart", 5)
+	if hrp then
+		char:PivotTo(SPAWNS[math.random(#SPAWNS)] * CFrame.new(0, 4, 0))
+	end
+end
+
+SetLighting = function()
+pcall(function() L.Ambient = Color3.fromRGB(138,138,138) end)
+pcall(function() L.Brightness = 3 end)
+pcall(function() L.ColorShift_Bottom = Color3.fromRGB(0,0,0) end)
+pcall(function() L.ColorShift_Top = Color3.fromRGB(0,0,0) end)
+pcall(function() L.OutdoorAmbient = Color3.fromRGB(128,128,128) end)
+pcall(function() L.ClockTime = 0 end)
+pcall(function() L.GeographicLatitude = 41.733299 end)
+pcall(function() L.ExposureCompensation = 0 end)
+pcall(function() L.GlobalShadows = true end)
+pcall(function() L.FogColor = Color3.fromRGB(192,192,192) end)
+pcall(function() L.FogEnd = 100000 end)
+pcall(function() L.FogStart = 0 end)
+pcall(function() L.EnvironmentDiffuseScale = 0 end)
+pcall(function() L.EnvironmentSpecularScale = 0 end)
+pcall(function() L.ShadowSoftness = 0.2 end)
+end
+C[1] = function()
+n[1]=Make("Folder",{Name="HDAdminWorkspaceFolder"},W)
+n[2]=Make("Part",{Name="Part",Material=Enum.Material.Grass,Color=Color3.fromRGB(74,150,74),Size=Vector3.new(620,65,549),CFrame=CFrame.new(88.515999,-31.450001,27.658001,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=true},W)
+n[3]=Make("SpawnLocation",{Name="SpawnLocation",Color=Color3.fromRGB(162,161,164),Size=Vector3.new(14,1,14),CFrame=CFrame.new(-191.411,1.05,1.388,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=true},W)
+n[4]=Make("Decal",{Name="Decal",Texture="rbxassetid://130626889939789",Face=Enum.NormalId.Top},n[3])
+n[5]=Make("SpawnLocation",{Name="SpawnLocation",Color=Color3.fromRGB(162,161,164),Size=Vector3.new(14,1,14),CFrame=CFrame.new(-191.411,1.05,17.388,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=true},W)
+n[6]=Make("Decal",{Name="Decal",Texture="rbxassetid://130626889939789",Face=Enum.NormalId.Top},n[5])
+n[7]=Make("SpawnLocation",{Name="SpawnLocation",Color=Color3.fromRGB(162,161,164),Size=Vector3.new(14,1,14),CFrame=CFrame.new(-175.411,1.05,17.388,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=true},W)
+n[8]=Make("Decal",{Name="Decal",Texture="rbxassetid://130626889939789",Face=Enum.NormalId.Top},n[7])
+n[9]=Make("SpawnLocation",{Name="SpawnLocation",Color=Color3.fromRGB(162,161,164),Size=Vector3.new(14,1,14),CFrame=CFrame.new(-175.411,1.05,33.388,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=true},W)
+n[10]=Make("Decal",{Name="Decal",Texture="rbxassetid://130626889939789",Face=Enum.NormalId.Top},n[9])
+n[11]=Make("SpawnLocation",{Name="SpawnLocation",Color=Color3.fromRGB(162,161,164),Size=Vector3.new(14,1,14),CFrame=CFrame.new(-175.411,1.05,1.388,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=true},W)
+n[12]=Make("Decal",{Name="Decal",Texture="rbxassetid://130626889939789",Face=Enum.NormalId.Top},n[11])
+n[13]=Make("SpawnLocation",{Name="SpawnLocation",Color=Color3.fromRGB(162,161,164),Size=Vector3.new(14,1,14),CFrame=CFrame.new(-191.411,1.05,34.388,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=true},W)
+n[14]=Make("Decal",{Name="Decal",Texture="rbxassetid://130626889939789",Face=Enum.NormalId.Top},n[13])
+n[15]=Make("Part",{Name="Part",Color=Color3.fromRGB(241,243,243),Size=Vector3.new(91,34,153),CFrame=CFrame.new(254.83299,17.549999,25.687,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=true},W)
+n[16]=Make("Part",{Name="Part",Color=Color3.fromRGB(236,234,234),Size=Vector3.new(126,6,153),CFrame=CFrame.new(237.33299,36.549999,25.687,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=true},W)
+n[17]=Make("Part",{Name="Part",Color=Color3.fromRGB(231,231,235),Size=Vector3.new(387,98,100),CFrame=CFrame.new(194.37199,49.549999,244.41,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=true},W)
+n[18]=Make("Part",{Name="Part",Color=Color3.fromRGB(241,243,243),Size=Vector3.new(387,98,100),CFrame=CFrame.new(194.37199,49.549999,-196.59,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=true},W)
+n[19]=Make("Part",{Name="Part",Color=Color3.fromRGB(248,248,248),Size=Vector3.new(390,25,18),CFrame=CFrame.new(194.886,4.0500002,188.36,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=true},W)
+n[20]=Make("Part",{Name="Part",Color=Color3.fromRGB(241,243,243),Size=Vector3.new(368,16,18),CFrame=CFrame.new(198.886,8.5500002,-141.64,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=true},W)
+n[21]=Make("Part",{Name="Part",Color=Color3.fromRGB(248,248,248),Size=Vector3.new(32,16,347),CFrame=CFrame.new(373.88599,8.5500002,23.860001,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=true},W)
+n[22]=Make("Part",{Name="Part",Color=Color3.fromRGB(248,248,248),Size=Vector3.new(11,16,129),CFrame=CFrame.new(10.386,8.5500002,-85.139999,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=true},W)
+n[23]=Make("Part",{Name="Part",Color=Color3.fromRGB(248,248,248),Size=Vector3.new(11,16,129),CFrame=CFrame.new(5.3860002,8.5500002,119.86,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=true},W)
+n[24]=Make("Part",{Name="Part",Color=Color3.fromRGB(248,248,248),Size=Vector3.new(71,121,77),CFrame=CFrame.new(252.37199,61.049999,-94.089996,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=true},W)
+n[25]=Make("Part",{Name="Part",Color=Color3.fromRGB(248,248,248),Size=Vector3.new(71,124,77),CFrame=CFrame.new(252.37199,62.549999,150.91,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=true},W)
+n[26]=Make("Part",{Name="Part",Material=Enum.Material.Ice,Color=Color3.fromRGB(255,255,0),Size=Vector3.new(71,68.199997,69),CFrame=CFrame.new(253.185,129.55,151.79601,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Shape=Enum.PartType.Ball,Anchored=true},W)
+n[27]=Make("Part",{Name="Part",Material=Enum.Material.Ice,Color=Color3.fromRGB(255,255,0),Size=Vector3.new(71,68.199997,69),CFrame=CFrame.new(253.185,129.55,-90.204002,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Shape=Enum.PartType.Ball,Anchored=true},W)
+n[28]=Make("Part",{Name="Part",Material=Enum.Material.Ice,Color=Color3.fromRGB(255,255,0),Size=Vector3.new(136,133.2,134),CFrame=CFrame.new(286.185,30.049999,28.796,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Shape=Enum.PartType.Ball,Anchored=true},W)
+n[29]=Make("Part",{Name="Part",Color=Color3.fromRGB(241,243,243),Size=Vector3.new(4,204,5),CFrame=CFrame.new(28.788,102.55,-114.601,1,0,0,0,1,0,0,0,1),TopSurface=Enum.SurfaceType.Smooth,BottomSurface=Enum.SurfaceType.Smooth,Anchored=t
